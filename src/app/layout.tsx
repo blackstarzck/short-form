@@ -41,10 +41,12 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <body
         suppressHydrationWarning
-        className={`${pretendard.variable} font-sans antialiased bg-black text-white`}
+        className={`${pretendard.variable} font-sans antialiased bg-gray-950 text-white flex justify-center`}
       >
-        {children}
-        <BottomNav />
+        <div className="w-full max-w-[430px] min-h-screen bg-black relative shadow-2xl overflow-x-hidden">
+          {children}
+          <BottomNav />
+        </div>
       </body>
     </html>
   );

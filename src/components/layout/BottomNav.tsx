@@ -16,7 +16,7 @@ export function BottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-16 bg-black border-t border-white/10 flex items-center justify-around z-40 pb-safe-bottom">
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] h-16 bg-black border-t border-white/10 flex items-center justify-around z-40 pb-safe-bottom">
       {navItems.map((item) => {
         const isActive = pathname ? (pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path))) : false;
         return (

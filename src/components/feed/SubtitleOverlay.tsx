@@ -1,6 +1,5 @@
 import React from 'react';
 import { Subtitle } from '@/types';
-import { cn } from '@/utils/cn';
 
 interface SubtitleOverlayProps {
   subtitles: Subtitle[];
@@ -16,16 +15,15 @@ export function SubtitleOverlay({ subtitles, currentTime }: SubtitleOverlayProps
 
   return (
     <div className="w-full px-6 text-center">
-      <div 
-        className={cn(
-          "inline-block bg-black/60 backdrop-blur-sm rounded-lg p-3",
-          "transition-all duration-200 ease-out"
-        )}
+      {/* No background box - just text with strong drop shadow for readability */}
+      <p 
+        className="text-white text-xl font-bold leading-relaxed"
+        style={{
+          textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)',
+        }}
       >
-        <p className="text-white text-lg font-medium leading-relaxed drop-shadow-md">
-          {currentSubtitle.text}
-        </p>
-      </div>
+        {currentSubtitle.text}
+      </p>
     </div>
   );
 }
