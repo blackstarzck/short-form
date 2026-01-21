@@ -27,11 +27,15 @@ const MOCK_AUTHORS = [
   { id: 'a2', name: '자청', role: 'Creator', followers: '45k', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jach' },
 ];
 
-export default function SearchPage() {
+// ... imports remain the same, but we will restructure the file slightly
+
+// MOCK DATA ... (keeping them as is, just need to make sure I don't lose them)
+
+function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
-  
+
   const [query, setQuery] = useState(initialQuery);
   const [activeTab, setActiveTab] = useState<'all' | 'books' | 'shorts' | 'people'>('all');
   const [isSearching, setIsSearching] = useState(false);
@@ -86,8 +90,8 @@ export default function SearchPage() {
               onClick={() => setActiveTab(tab.id as any)}
               className={cn(
                 "px-4 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap border",
-                activeTab === tab.id 
-                  ? "bg-white text-black border-white" 
+                activeTab === tab.id
+                  ? "bg-white text-black border-white"
                   : "bg-transparent text-white/60 border-white/10 hover:border-white/30"
               )}
             >
@@ -118,7 +122,7 @@ export default function SearchPage() {
                     도서
                   </h3>
                   {activeTab === 'all' && (
-                    <button 
+                    <button
                       onClick={() => setActiveTab('books')}
                       className="text-xs text-white/50 hover:text-white transition-colors"
                     >
@@ -153,7 +157,7 @@ export default function SearchPage() {
                     쇼츠
                   </h3>
                   {activeTab === 'all' && (
-                    <button 
+                    <button
                       onClick={() => setActiveTab('shorts')}
                       className="text-xs text-white/50 hover:text-white transition-colors"
                     >
@@ -207,5 +211,13 @@ export default function SearchPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen bg-black text-white p-4">Loading...</div>}>
+      <SearchContent />
+    </React.Suspense>
   );
 }
