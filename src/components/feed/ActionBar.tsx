@@ -1,5 +1,6 @@
 import React from 'react';
 import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal } from 'lucide-react';
+import { cn } from '@/utils/cn';
 
 interface ActionBarProps {
   likes?: number;
@@ -61,8 +62,9 @@ export function ActionBar({
 
       {/* More */}
       <ActionItem 
-        icon={<MoreHorizontal className="w-7 h-7" />} 
+        icon={<MoreHorizontal className="w-6 h-6" />} 
         onClick={onMore}
+        className="bg-black/30 p-2 rounded-full backdrop-blur-sm hover:bg-black/40"
       />
     </div>
   );
@@ -71,18 +73,24 @@ export function ActionBar({
 function ActionItem({ 
   icon, 
   label, 
-  onClick 
+  onClick,
+  className
 }: { 
   icon: React.ReactNode; 
   label?: string; 
   onClick?: () => void;
+  className?: string;
 }) {
   return (
     <div className="flex flex-col items-center gap-1">
       <button 
         onClick={onClick}
-        className="text-white drop-shadow-lg hover:scale-110 transition-transform active:scale-95"
-        style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
+        className={cn(
+          "text-white drop-shadow-lg transition-all active:scale-95",
+          !className && "hover:scale-110", // Only apply scale hover if no custom class (to avoid conflict with bg hover)
+          className
+        )}
+        style={{ filter: className ? 'none' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
       >
         {icon}
       </button>

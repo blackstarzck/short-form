@@ -43,14 +43,14 @@ export function VideoPlayer({ video, isActive, onNext }: VideoPlayerProps) {
     setIsOverlayExpanded(false);
   }, [video.id]);
 
-  // Control playback based on active state and ending card
+  // Control playback based on active state, ending card, and overlay expansion
   useEffect(() => {
-    if (isActive && !showEnding) {
+    if (isActive && !showEnding && !isOverlayExpanded) {
       play();
     } else {
       pause();
     }
-  }, [isActive, showEnding, play, pause]);
+  }, [isActive, showEnding, isOverlayExpanded, play, pause]);
 
   // Check for video end to show Ending Card
   const onTimeUpdate = () => {
@@ -101,9 +101,9 @@ export function VideoPlayer({ video, isActive, onNext }: VideoPlayerProps) {
         <div className="absolute bottom-[calc(5rem+env(safe-area-inset-bottom))] left-4 right-4 z-30 group h-2 hover:h-4 transition-all duration-200 cursor-pointer">
           {/* Background Track */}
           <div className="absolute bottom-0 w-full h-1 bg-white/30 rounded-full group-hover:h-2 transition-all duration-200" />
-          
+
           {/* Progress Fill */}
-          <div 
+          <div
             className="absolute bottom-0 h-1 bg-brand rounded-full group-hover:h-2 transition-all duration-200 ease-linear"
             style={{ width: `${progress}%` }}
           >
@@ -120,8 +120,8 @@ export function VideoPlayer({ video, isActive, onNext }: VideoPlayerProps) {
             onChange={(e) => {
               const percentage = parseFloat(e.target.value);
               if (videoRef.current) {
-                 const time = (percentage / 100) * videoRef.current.duration;
-                 seek(time);
+                const time = (percentage / 100) * videoRef.current.duration;
+                seek(time);
               }
             }}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -163,7 +163,7 @@ export function VideoPlayer({ video, isActive, onNext }: VideoPlayerProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="absolute inset-0 bg-black/80 z-30 touch-none"
+            className="absolute inset-0 bg-black/80 z-30 touch-none backdrop-blur-sm"
             onClick={() => setIsOverlayExpanded(false)}
           />
         )}
@@ -175,8 +175,8 @@ export function VideoPlayer({ video, isActive, onNext }: VideoPlayerProps) {
           "absolute bottom-[calc(6rem+env(safe-area-inset-bottom))] z-40 pointer-events-auto",
           isOverlayExpanded ? "left-0 w-full px-4" : "left-4 max-w-[75%]"
         )}>
-          <PostCaption 
-            video={video} 
+          <PostCaption
+            video={video}
             isExpanded={isOverlayExpanded}
             onToggle={() => setIsOverlayExpanded(!isOverlayExpanded)}
           />
@@ -192,7 +192,7 @@ export function VideoPlayer({ video, isActive, onNext }: VideoPlayerProps) {
 
       {/* Action Bar - Just More Button */}
       {!showEnding && !isOverlayExpanded && (
-        <div className="absolute right-3 bottom-[calc(7rem+env(safe-area-inset-bottom))] z-20 pointer-events-auto">
+        <div className="absolute right-3 bottom-[calc(7rem+env(safe-area-inset-bottom))] z-20 pointer-events-auto bg-black/80 rounded-full">
           <button
             onClick={() => setShowActionSheet(true)}
             className="p-2 text-white/90 hover:text-white transition-colors"

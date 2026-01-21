@@ -41,6 +41,7 @@ function Star({ cx, cy, r, color, label, opacity, pulse, onClick }: StarProps) {
             ease: "easeOut",
             repeatDelay: 0.5 
           }}
+          style={{ pointerEvents: 'none' }}
         />
       )}
       
@@ -133,7 +134,10 @@ export function ConstellationMap({ onStarClick, id, className }: ConstellationMa
         {/* Center (Economy) */}
         <Star 
           cx={200} cy={200} r={12} color="#FF9800" label="경제/경영" opacity={1} pulse 
-          onClick={() => onStarClick?.('경제/경영')} 
+          onClick={() => {
+            console.log('Star clicked: 경제/경영');
+            onStarClick?.('경제/경영');
+          }} 
         />
         {/* Tech */}
         <Star 

@@ -169,7 +169,7 @@ export default function ProfilePage() {
             />
          </div>
 
-         <p className="text-center text-white/40 text-xs mt-3 animate-pulse">
+         <p className="text-center text-white/40 text-xs mt-3">
             <span className="text-brand">경제/경영</span> 분야의 지식이 빛나고 있습니다.
          </p>
       </section>
