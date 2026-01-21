@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/utils/cn';
 import { motion } from 'framer-motion';
 
@@ -14,10 +16,16 @@ interface StarProps {
 }
 
 function Star({ cx, cy, r, color, label, opacity, pulse, onClick }: StarProps) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <g className="cursor-pointer hover:opacity-100 transition-opacity group" onClick={onClick}>
-      {/* Ripple Animation */}
-      {pulse && (
+      {/* Ripple Animation - Client Only */}
+      {isMounted && pulse && (
         <motion.circle
           cx={cx}
           cy={cy}
@@ -78,17 +86,23 @@ interface ConstellationMapProps {
 }
 
 export function ConstellationMap({ onStarClick, id, className }: ConstellationMapProps) {
-  // Deterministic random background stars
-  const backgroundStars = Array.from({length: 50}).map((_, i) => {
-    const seed = i + 1;
-    const r1 = Math.sin(seed) * 10000;
-    const x = (r1 - Math.floor(r1)) * 400;
-    
-    const r2 = Math.cos(seed) * 10000;
-    const y = (r2 - Math.floor(r2)) * 400;
+  // Use state to store stars to ensure consistency between server and client
+  const [backgroundStars, setBackgroundStars] = useState<any[]>([]);
 
-    return { id: i, x, y, r: (i % 3) * 0.5 + 0.5, opacity: ((i % 5) + 1) * 0.1 };
-  });
+  useEffect(() => {
+    // Generate stars only on client side to avoid hydration mismatch due to math precision differences
+    const stars = Array.from({length: 50}).map((_, i) => {
+      const seed = i + 1;
+      const r1 = Math.sin(seed) * 10000;
+      const x = (r1 - Math.floor(r1)) * 400;
+      
+      const r2 = Math.cos(seed) * 10000;
+      const y = (r2 - Math.floor(r2)) * 400;
+
+      return { id: i, x, y, r: (i % 3) * 0.5 + 0.5, opacity: ((i % 5) + 1) * 0.1 };
+    });
+    setBackgroundStars(stars);
+  }, []);
 
   return (
     <div 

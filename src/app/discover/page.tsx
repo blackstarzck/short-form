@@ -27,7 +27,22 @@ const CURATIONS = [
   { id: 3, title: "돈의 속성", desc: "최상위 부자가 말하는 돈에 대한 모든 것", color: "from-green-900 to-teal-900" },
 ];
 
+import { useRouter } from 'next/navigation';
+
+// ... (previous code)
+
 export default function ExplorePage() {
+  const router = useRouter();
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const query = e.currentTarget.value;
+      if (query.trim()) {
+        router.push(`/search?q=${encodeURIComponent(query)}`);
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen pb-24 bg-black text-white">
       {/* Search Bar */}
@@ -39,6 +54,7 @@ export default function ExplorePage() {
           <input
             type="text"
             placeholder="지식, 도서, 크리에이터 검색"
+            onKeyDown={handleSearchKeyDown}
             className="w-full py-3 pl-10 pr-4 bg-gray-900 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand/50 transition-all"
           />
         </div>
@@ -53,7 +69,7 @@ export default function ExplorePage() {
             spaceBetween={16}
             slidesPerView={'auto'}
             centeredSlides={true}
-            pagination={{ 
+            pagination={{
               clickable: true,
               dynamicBullets: true,
             }}
@@ -70,11 +86,11 @@ export default function ExplorePage() {
               <SwiperSlide key={item.id} className="!w-[85vw]">
                 <Link href={`/book/${item.id}`}>
                   <div className={`aspect-video bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center relative overflow-hidden group cursor-pointer active:scale-98 transition-transform shadow-lg`}>
-                     <div className="text-center z-10 p-4 transform transition-transform group-hover:scale-105">
-                        <h3 className="text-2xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
-                        <p className="text-white/80 text-sm drop-shadow-md">{item.desc}</p>
-                     </div>
-                     <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=600&auto=format&fit=crop')] opacity-20 bg-cover bg-center transition-opacity group-hover:opacity-30" />
+                    <div className="text-center z-10 p-4 transform transition-transform group-hover:scale-105">
+                      <h3 className="text-2xl font-bold mb-2 drop-shadow-lg">{item.title}</h3>
+                      <p className="text-white/80 text-sm drop-shadow-md">{item.desc}</p>
+                    </div>
+                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=600&auto=format&fit=crop')] opacity-20 bg-cover bg-center transition-opacity group-hover:opacity-30" />
                   </div>
                 </Link>
               </SwiperSlide>
@@ -87,7 +103,7 @@ export default function ExplorePage() {
           <h2 className="text-lg font-bold mb-4">관심 분야 탐색</h2>
           <div className="grid grid-cols-2 gap-3">
             {CATEGORIES.map((cat) => (
-              <Link 
+              <Link
                 href={`/category/${cat.id}`}
                 key={cat.id}
                 className={cn(
@@ -103,24 +119,24 @@ export default function ExplorePage() {
 
         {/* Trending Shorts Grid */}
         <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 px-4">
-           <h2 className="text-lg font-bold mb-4">급상승 쇼츠</h2>
-           <div className="grid grid-cols-3 gap-0.5 -mx-4 pb-4">
-             {/* Dummy grid items */}
-             {Array.from({ length: 15 }).map((_, i) => (
-               <div key={i} className="aspect-[3/4] bg-gray-900 relative cursor-pointer hover:brightness-110 transition-all">
-                 <img 
-                   src={`https://picsum.photos/300/400?random=${i + 100}`} 
-                   alt="Thumbnail" 
-                   className="w-full h-full object-cover"
-                   loading="lazy"
-                 />
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity" />
-                 <div className="absolute bottom-1 right-1 flex items-center gap-0.5 text-[10px] font-medium text-white drop-shadow-md">
-                    <span>👀 {((i * 3.7) % 10 + 1).toFixed(1)}k</span>
-                 </div>
-               </div>
-             ))}
-           </div>
+          <h2 className="text-lg font-bold mb-4">급상승 쇼츠</h2>
+          <div className="grid grid-cols-3 gap-0.5 -mx-4 pb-4">
+            {/* Dummy grid items */}
+            {Array.from({ length: 15 }).map((_, i) => (
+              <div key={i} className="aspect-[3/4] bg-gray-900 relative cursor-pointer hover:brightness-110 transition-all">
+                <img
+                  src={`https://picsum.photos/300/400?random=${i + 100}`}
+                  alt="Thumbnail"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+                <div className="absolute bottom-1 right-1 flex items-center gap-0.5 text-[10px] font-medium text-white drop-shadow-md">
+                  <span>👀 {((i * 3.7) % 10 + 1).toFixed(1)}k</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       </div>
     </div>
