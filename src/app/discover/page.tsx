@@ -132,7 +132,7 @@ export default function ExplorePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity" />
                 <div className="absolute bottom-1 right-1 flex items-center gap-0.5 text-[10px] font-medium text-white drop-shadow-md">
-                  <span>👀 {((i * 3.7) % 10 + 1).toFixed(1)}k</span>
+                  <span>{((i * 3.7) % 10 + 1).toFixed(1)}k</span>
                 </div>
               </div>
             ))}
