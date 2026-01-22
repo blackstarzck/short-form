@@ -126,8 +126,19 @@ export async function getVideos(page = 1, limit = 5): Promise<Video[]> {
     if (error || !data || data.length === 0) {
       // Fallback to Mock if DB fetch fails or empty
       console.warn("Fetching from Supabase DB failed or empty, using Mock data.", error);
+      
+      const mockData = Array.from({ length: limit }).map((_, i) => {
+        const globalIndex = (page - 1) * limit + i;
+        const template = MOCK_VIDEOS[globalIndex % MOCK_VIDEOS.length];
+        return {
+          ...template,
+          id: `${template.id}_${page}_${i}`,
+          title: `${template.title} #${globalIndex + 1}`,
+        };
+      });
+
       await new Promise(resolve => setTimeout(resolve, 500));
-      return MOCK_VIDEOS;
+      return mockData;
     }
 
     // Map DB result to Video type

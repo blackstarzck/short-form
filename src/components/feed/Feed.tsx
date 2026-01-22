@@ -3,16 +3,56 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { Video } from '@/types';
 import { VideoPlayer } from './VideoPlayer';
+import { RecommendationCard, RecommendationData } from './RecommendationCard';
 import { useInfiniteVideos } from '@/hooks/useInfiniteVideos';
 import { Skeleton } from '@/components/shared/Skeleton';
 import { Loader2 } from 'lucide-react';
 
-/**
- * 영상 로딩 규칙:
- * - 초기 로드: 5개
- * - 추가 로드: 남은 영상 2개 이하일 때 5개씩 추가
- * - 빠른 스크롤 대응: 스크롤 멈춤 후 위치 확인하여 필요시 로드
- */
+// Dummy Data for Recommendation Cards (4 Types)
+const RECOMMENDATIONS: RecommendationData[] = [
+  // 1. Spotlight
+  {
+    type: 'spotlight',
+    title: "부의 추월차선",
+    author: "엠제이 드마코",
+    description: "젊어서 은퇴하고 부자가 되고 싶다면, 지금 당장 추월차선에 올라타라.",
+    coverUrl: "https://image.yes24.com/goods/90547454/XL",
+    themeColor: "from-yellow-900 to-orange-900",
+    points: 500
+  },
+  // 2. List
+  {
+    type: 'list',
+    title: "성공하는 사람들의 습관",
+    description: "상위 1%가 매일 실천하는 비밀스러운 루틴",
+    themeColor: "from-blue-900 to-slate-900",
+    books: [
+      { title: "타이탄의 도구들", author: "팀 페리스", coverUrl: "https://image.yes24.com/goods/37299335/XL" },
+      { title: "아주 작은 습관의 힘", author: "제임스 클리어", coverUrl: "https://image.yes24.com/goods/69655504/XL" },
+      { title: "그릿", author: "앤절라 더크워스", coverUrl: "https://image.yes24.com/goods/32953272/XL" },
+      { title: "마인드셋", author: "캐럴 드웩", coverUrl: "https://image.yes24.com/goods/57723223/XL" }
+    ]
+  },
+  // 3. Curation
+  {
+    type: 'curation',
+    title: "새벽 4시의 기적",
+    description: "세상이 잠든 시간, 오직 나에게 집중하며 미래를 바꾸는 시간. 미라클 모닝을 위한 필독서.",
+    themeColor: "from-indigo-900 to-purple-900",
+    backgroundImage: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1000&auto=format&fit=crop",
+    points: 1000
+  },
+  // 4. New
+  {
+    type: 'new',
+    title: "퓨처 셀프",
+    author: "벤저민 하디",
+    description: "미래의 나를 명확하게 그리면 현재의 행동이 바뀐다.",
+    coverUrl: "https://image.yes24.com/goods/122090075/XL",
+    themeColor: "from-red-900 to-rose-900",
+    points: 300
+  }
+];
 
 function FeedItem({
   video,
@@ -93,15 +133,27 @@ export function Feed() {
   return (
     <>
       <div className="h-screen w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar bg-black">
-        {videos.map((video, index) => (
-          <FeedItem
-            key={video.id}
-            video={video}
-            index={index}
-            isActive={activeVideoId === video.id}
-            onInView={handleInView}
-          />
-        ))}
+        {videos.map((video, index) => {
+          const isRecPosition = (index + 1) % 1 === 0; // Insert every 1 video
+          const recIndex = Math.floor((index + 1) / 1) - 1;
+          const recommendation = RECOMMENDATIONS[recIndex % RECOMMENDATIONS.length];
+
+          return (
+            <React.Fragment key={`${video.id}-${index}`}>
+              <FeedItem
+                video={video}
+                index={index}
+                isActive={activeVideoId === video.id}
+                onInView={handleInView}
+              />
+              {isRecPosition && recommendation && (
+                <RecommendationCard
+                  {...recommendation}
+                />
+              )}
+            </React.Fragment>
+          );
+        })}
 
         {/* 추가 로딩 인디케이터 */}
         {loadingMore && (
