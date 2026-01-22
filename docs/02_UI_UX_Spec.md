@@ -2,29 +2,39 @@
 
 ## 1. Z-Index 계층 구조 (Layering Strategy)
 * **Level 0:** Video Element (배경 영상)
+* **Level 5:** **Gradient Overlay** (하단 텍스트 가독성 확보용, `black/70` from bottom 25%)
 * **Level 10:** Subtitle Overlay (AI 자막)
-* **Level 20:** Action Buttons / More Button (우측 하단 아이콘)
+* **Level 20:** Action Buttons / **Book Search Button** (우측 하단 아이콘)
 * **Level 30:** Progress Bar (최하단 재생 바)
 * **Level 40:** **Post Caption & Overlay** (게시글 확장 및 배경 암전)
-* **Level 50:** Deep Dive Sheet / Interaction Popups (인사이트 시트 및 팝업)
+* **Level 50:** **Book Reader** / Deep Dive Sheet (전체 화면 독서 모드 및 인사이트 시트)
 
 ## 2. 릴스형 상세글 오버레이 (In-place Expansion)
 * **접힘 상태 (Collapsed):**
-    * `max-w-[75%]`, `left-4`, `bottom-[calc(2rem+safe-area)]`.
-    * `line-clamp-2` 적용 (최대 2줄 노출, 폰트 12px).
+    * **도서 정보 모드:** 도서 커버(`86px` x `128px`), 제목(Bold), 저자, 출판사 순으로 노출.
+    * **일반 모드:** 사용자 아바타 및 닉네임 노출.
+    * 영역 클릭 시 확장 애니메이션 트리거.
 * **펼침 상태 (Expanded):**
-    * `w-full`, `left-0`, `px-4`, `max-height: 65vh`.
-    * 내용이 길어질 경우 `overflow-y-auto` 적용하여 내부 스크롤 활성화.
-    * 상세 정보(목차 등)는 14px로 가독성 확보.
+    * **책 소개:** 상단에 배치, 기본 2줄 노출(`line-clamp-2`) + '더보기' 버튼(Brand Color)으로 전체 보기 토글.
+    * **상세 정보:** 카테고리, 페이지, 용량, ISBN 등 메타 정보를 카드 UI 없이 깔끔한 텍스트 그리드로 표현.
+    * **목차:** 계층 구조를 시각화(좌측 보더 등)하여 리스트업.
+    * **스크롤바:** `no-scrollbar` 유틸리티 적용하여 스크롤은 가능하되 스크롤바는 숨김.
 * **애니메이션:**
-    * **배경:** `bg-black/80` 레이어 0.3초간 Fade-in (기존 50%에서 상향 조정).
+    * **배경:** `bg-black/80` 레이어 0.3초간 Fade-in.
     * **텍스트:** 즉시 확장 (Instant).
-* **집중 모드 (Focus Mode):** 확장 시 자막(Level 10), 액션 버튼(Level 20), Progress Bar(Level 30)를 숨김 처리.
 
 ## 3. 주요 구성 요소 상세
-* **자막 (Subtitle):** `top-[calc(4rem+safe-area)]`, 텍스트 섀도우 적용, 배경 박스 없음.
-* **액션 버튼:** '더 보기'(`MoreHorizontal`) 아이콘만 노출. 클릭 시 액션 시트 호출.
-* **비주얼 훅:** 영상 시작 후 3초간 중앙 대형 타이포그래피로 지식 가치 제안.
+* **자막 (Subtitle):** `top-[calc(4rem+safe-area)]`, 텍스트 섀도우 적용.
+* **액션 버튼 (우측 하단):**
+    * **책 검색(바로 읽기):** `BookSearch` 아이콘 적용.
+        * **Loading State:** 클릭 시 버튼 테두리에 원형 프로그레스 바(Brand Color) 애니메이션 + 중앙 진행률(%) 숫자 표시.
+        * **완료:** 100% 도달 후 0.3초 딜레이 뒤 `Book Reader` 오버레이 호출.
+    * **더 보기:** `MoreHorizontal` 아이콘. 클릭 시 액션 시트 호출.
+* **도서 리더기 (Book Reader):**
+    * **진입:** 우측에서 좌측으로 슬라이드 (`Slide-in-from-right`).
+    * **디자인:** 종이책 질감의 미색 배경(`#F9F7F1`), Serif 폰트 사용으로 가독성 및 감성 강화.
+    * **구조:** 헤더(뒤로가기, 챕터명), 본문(스크롤 가능), 하단(진행률 바).
+* **그라데이션 오버레이:** 영상 하단 25% 영역에 `black/70` -> `transparent` 그라데이션을 적용하여 흰색 텍스트(도서 정보)의 가독성 확보.
 
 ---
 
@@ -52,7 +62,7 @@
     * **진입:** 도서 카드 클릭 시 상세 페이지 Slide-up (Sheet 방식).
 * **도서 상세 페이지:**
     * **헤더:** 스크롤 시 커버 이미지 Blur 처리, 타이틀 상단 고정 (Sticky Header).
-    * **CTA:** '전자책 구매/구독' 버튼 하단 Sticky. (Bottom Navigation 상단 `bottom-16` 배치로 겹침 방지).
+    * **CTA:** '바로 읽기' 버튼 클릭 시 쇼츠와 동일한 `Book Reader` 오버레이 호출.
 
 ## 5. 반응형 및 모바일 최적화
 * **Viewport Restriction:** 데스크탑에서도 모바일 경험을 유지하기 위해 `max-w-[430px]`, `mx-auto` 적용.

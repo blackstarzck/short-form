@@ -11,8 +11,9 @@
 │   │   └── layout.tsx          # Root Layout (Mobile Viewport Wrapper)
 │   ├── components/
 │   │   ├── feed/               # 숏폼 핵심 컴포넌트
-│   │   │   ├── VideoPlayer.tsx        # 비디오 재생 및 UI 오케스트레이션
+│   │   │   ├── VideoPlayer.tsx        # 비디오 재생 및 UI 오케스트레이션 (Reader Trigger)
 │   │   │   ├── PostCaption.tsx        # 게시글 확장 및 도서 정보 오버레이
+│   │   │   ├── BookReader.tsx         # [NEW] 도서 리더기 오버레이 컴포넌트
 │   │   │   ├── SubtitleOverlay.tsx    # 상단 자막
 │   │   │   └── ActionSheet.tsx        # 더보기 메뉴
 │   │   ├── layout/             # 공통 레이아웃
@@ -25,8 +26,8 @@
 ## 2. 핵심 기술 스택
 * **Framework:** Next.js 14+ (App Router)
 * **Language:** TypeScript
-* **Styling:** Tailwind CSS 4
-* **Animation:** Framer Motion (`AnimatePresence`, `motion.div`)
+* **Styling:** Tailwind CSS 4 (`no-scrollbar` 유틸리티 적용)
+* **Animation:** Framer Motion (`AnimatePresence`, `motion.div`, Spring Transitions)
 * **Carousel:** Swiper.js (`swiper/react`, `Pagination`)
 * **Icons:** Lucide React
 
@@ -37,11 +38,13 @@
 * **Positioning Strategy:** `fixed` 포지셔닝을 사용하는 요소(헤더, 바텀네비, CTA)는 `w-full max-w-[430px] left-1/2 -translate-x-1/2` 스타일을 적용하여 뷰포트 중앙에 고정되도록 구현.
 
 ### 3.2 게시글 확장 (In-place Expansion)
-* **State Management:** `VideoPlayer`가 `isOverlayExpanded` 상태를 관리하고 `PostCaption`에 Props로 전달(Controlled Component)하여 오버레이 배경과 텍스트 확장의 동기화 보장.
-* **Layering:** `z-index` 계층을 세분화하여 오버레이 활성화 시 자막, 버튼, 프로그레스 바가 자연스럽게 가려지도록(Focus Mode) 처리.
+* **State Management:** `VideoPlayer`가 `isOverlayExpanded` 상태를 관리하고 `PostCaption`에 Props로 전달하여 오버레이 배경과 텍스트 확장의 동기화 보장.
+* **UI Structure:** 도서 정보가 있는 경우 사용자 정보 대신 도서 커버 이미지를 강조하고, 클릭 시 목차 및 책 소개를 포함한 상세 오버레이 노출.
+* **Layering:** `z-index` 계층을 세분화(Video < Gradient < Subtitle < Action < Caption < Reader)하여 모드별 시인성 확보.
 
-### 3.3 Next.js 호환성
-* **Routing Params:** Next.js 15+ 대응을 위해 Client Component에서 `props.params` 대신 `useParams()` 훅을 사용하여 동적 라우팅 파라미터 접근 (`/book/[id]`, `/category/[id]`).
+### 3.3 도서 리더기 (Seamless Reading Experience)
+* **Interaction:** '책 검색' 버튼 클릭 시 `setInterval`을 이용한 테두리 프로그레스 로딩 시뮬레이션 후 리더기 오픈.
+* **Component:** `BookReader`는 별도 페이지가 아닌 오버레이 컴포넌트로 구현되어, 영상 재생 상태를 유지하거나(일시정지 후) 빠른 복귀가 가능하도록 설계.
 
 ### 3.4 성능 최적화
 * **Hydration Mismatch 방지:** `Math.random()` 대신 결정적(Deterministic) 알고리즘이나 인덱스 기반의 값을 사용하여 서버/클라이언트 렌더링 불일치 해결.
