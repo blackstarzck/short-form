@@ -1,7 +1,6 @@
 import React from 'react';
 import { BottomSheet } from '@/components/shared/BottomSheet';
 import { Video } from '@/types';
-import { BookCard } from '@/components/shared/BookCard';
 import { 
   Heart, 
   MessageCircle, 
@@ -36,18 +35,6 @@ export function ActionSheet({
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} title="더보기">
       <div className="space-y-1 pb-10">
-        {/* Book Purchase Link (High Priority) */}
-        {video.related_book && (
-          <div className="mb-6">
-            <BookCard
-              coverUrl={video.related_book.cover_url}
-              title={video.related_book.title}
-              author={video.related_book.author}
-              purchaseUrl={video.related_book.purchase_url}
-            />
-          </div>
-        )}
-
         <ActionRow 
           icon={<Heart className={cn(video.stats.likes > 0 ? "fill-red-500 text-red-500" : "")} />} 
           label={`좋아요 ${video.stats.likes > 0 ? video.stats.likes : ''}`} 

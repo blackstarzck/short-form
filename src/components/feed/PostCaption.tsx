@@ -36,10 +36,167 @@ const BOOK_INFO = {
 
 export function PostCaption({ video, isExpanded, onToggle }: PostCaptionProps) {
 
+  const [isDescExpanded, setIsDescExpanded] = React.useState(false);
+
+  // Reset description expansion when the sheet is closed
+  React.useEffect(() => {
+    if (!isExpanded) {
+      setIsDescExpanded(false);
+    }
+  }, [isExpanded]);
+
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     onToggle();
   };
+
+  const toggleDesc = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDescExpanded(!isDescExpanded);
+  };
+
+  if (video.related_book) {
+    return (
+      <div
+        className="relative z-40 cursor-pointer"
+        onClick={handleToggle}
+      >
+        <div className="flex items-start gap-4">
+          {/* Cover Image */}
+          <div className="relative group shrink-0">
+            <img
+              src={video.related_book.cover_url}
+              alt={video.related_book.title}
+              className="w-[86px] h-[128px] rounded-md shadow-lg object-cover border border-white/10"
+              style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)' }}
+            />
+          </div>
+
+          {/* Info Column */}
+          <div className="flex flex-col flex-1 min-h-[128px] py-1">
+            {/* Category */}
+            <p 
+              className="text-xs text-white/70 mb-1 font-medium"
+              style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+            >
+              {BOOK_INFO.category}
+            </p>
+
+            {/* Title */}
+            <h3 
+              className="font-bold text-base text-white leading-tight mb-1 line-clamp-2"
+              style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+            >
+              {video.related_book.title}
+            </h3>
+            
+            {/* Author */}
+            <p 
+              className="text-sm text-white/90 font-medium mb-0.5"
+              style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+            >
+              {video.related_book.author}
+            </p>
+            
+            {/* Publisher */}
+            <p 
+              className="text-xs text-white/70"
+              style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+            >
+              출판사 • {BOOK_INFO.publisher}
+            </p>
+          </div>
+        </div>
+
+        {/* Expanded Content - Only for Book */}
+        <div
+          className="overflow-hidden transition-all duration-300 ease-in-out no-scrollbar"
+          style={{
+            maxHeight: isExpanded ? '65vh' : '0',
+            opacity: isExpanded ? 1 : 0,
+            overflowY: isExpanded ? 'auto' : 'hidden',
+          }}
+        >
+          <div className="pt-6 pb-10 space-y-8 no-scrollbar h-full overflow-y-auto">
+
+            {/* Book Description with Read More */}
+            <div className="relative pl-1">
+              <p 
+                className={cn(
+                  "text-sm text-white/90 leading-relaxed whitespace-pre-wrap",
+                  !isDescExpanded && "line-clamp-2"
+                )}
+              >
+                {video.description}
+              </p>
+              {!isDescExpanded && (
+                <button
+                  onClick={toggleDesc}
+                  className="text-xs font-bold text-brand mt-2 hover:text-brand/80 transition-colors flex items-center gap-0.5"
+                >
+                  더보기
+                </button>
+              )}
+            </div>
+
+            {/* Meta Info Grid */}
+            <div>
+              <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                <span className="w-1 h-4 bg-blue-500 rounded-full"></span>
+                상세 정보
+              </h4>
+              <div className="grid grid-cols-1 gap-y-3 text-sm bg-white/5 rounded-xl p-4 backdrop-blur-sm">
+                <div className="grid grid-cols-[80px_1fr] items-baseline gap-4 border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                  <span className="text-white/50 font-medium">카테고리</span>
+                  <span className="text-white/90">{BOOK_INFO.category}</span>
+                </div>
+                <div className="grid grid-cols-[80px_1fr] items-baseline gap-4 border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                  <span className="text-white/50 font-medium">출판사</span>
+                  <span className="text-white/90">{BOOK_INFO.publisher}</span>
+                </div>
+                <div className="grid grid-cols-[80px_1fr] items-baseline gap-4 border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                  <span className="text-white/50 font-medium">페이지</span>
+                  <span className="text-white/90">{BOOK_INFO.pages}p</span>
+                </div>
+                <div className="grid grid-cols-[80px_1fr] items-baseline gap-4 border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                  <span className="text-white/50 font-medium">용량</span>
+                  <span className="text-white/90">{BOOK_INFO.fileSize}</span>
+                </div>
+                <div className="grid grid-cols-[80px_1fr] items-baseline gap-4 border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                  <span className="text-white/50 font-medium">출간일</span>
+                  <div className="flex flex-col gap-1">
+                     <span className="text-white/90">종이책 {BOOK_INFO.publishDatePaper}</span>
+                     <span className="text-white/90">전자책 {BOOK_INFO.publishDateEbook}</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-[80px_1fr] items-baseline gap-4">
+                  <span className="text-white/50 font-medium">ISBN</span>
+                  <span className="font-mono text-white/80 tracking-wide">{BOOK_INFO.isbn}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Table of Contents */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="w-1 h-4 bg-purple-500 rounded-full"></span>
+                <span className="text-sm font-bold text-white">목차</span>
+              </div>
+              <div className="bg-white/5 rounded-xl p-4 backdrop-blur-sm">
+                <ul className="space-y-4">
+                  {BOOK_INFO.toc.map((item, i) => (
+                    <li key={i} className="text-sm text-white/90 relative pl-4 hover:text-white transition-colors leading-relaxed">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -96,86 +253,6 @@ export function PostCaption({ video, isExpanded, onToggle }: PostCaptionProps) {
         >
           <span className="whitespace-pre-wrap">{video.description}</span>
         </div>
-
-        {/* Book Info Section */}
-        {video.related_book && (
-          <div className={cn("mt-3 transition-all duration-300", isExpanded && "mt-6 pt-5 border-t border-white/20")}>
-            {/* Basic Info */}
-            <div className="flex items-center gap-2">
-              <div className="flex flex-wrap items-baseline gap-x-2">
-                <span
-                  className={cn(
-                    "text-sm text-white/80 transition-all",
-                    isExpanded && "text-base font-semibold text-white"
-                  )}
-                  style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
-                >
-                  {video.related_book.title}
-                </span>
-                <span
-                  className="text-sm text-white/70"
-                  style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
-                >
-                  · {video.related_book.author}
-                </span>
-              </div>
-            </div>
-
-            {/* Extended Details (Only Visible When Expanded) */}
-            {isExpanded && (
-              <div className="mt-5 space-y-6 pb-10">
-                {/* Meta Info Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm text-white/90">
-                  <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                    <span className="text-white/70 font-medium">카테고리</span>
-                    <span className="text-right truncate ml-4">{BOOK_INFO.category}</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                    <span className="text-white/70 font-medium">출판사</span>
-                    <span className="text-right">{BOOK_INFO.publisher}</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                    <span className="text-white/70 font-medium">페이지</span>
-                    <span>{BOOK_INFO.pages}p</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                    <span className="text-white/70 font-medium">용량</span>
-                    <span>{BOOK_INFO.fileSize}</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                    <span className="text-white/70 font-medium">종이책</span>
-                    <span>{BOOK_INFO.publishDatePaper}</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                    <span className="text-white/70 font-medium">전자책</span>
-                    <span>{BOOK_INFO.publishDateEbook}</span>
-                  </div>
-                  <div className="col-span-1 sm:col-span-2 flex justify-between items-center pt-1">
-                    <span className="text-white/70 font-medium">ISBN</span>
-                    <span className="font-mono text-white/80 tracking-wide">{BOOK_INFO.isbn}</span>
-                  </div>
-                </div>
-
-                {/* Table of Contents */}
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="h-5 w-1.5 bg-white/60 rounded-full" />
-                    <span className="text-base font-bold text-white">목차</span>
-                  </div>
-                  <ul className="space-y-3 pl-2 border-l-2 border-white/10 ml-2">
-                    {BOOK_INFO.toc.map((item, i) => (
-                      <li key={i} className="text-sm text-white/90 pl-4 relative group hover:text-white transition-colors leading-relaxed">
-                        {/* Dot indicator on hover */}
-                        <div className="absolute left-[-5px] top-2 w-2 h-2 rounded-full bg-white/0 group-hover:bg-white/40 transition-all" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

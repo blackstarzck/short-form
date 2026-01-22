@@ -5,10 +5,11 @@ import { EndingCard } from './EndingCard';
 import { ActionSheet } from './ActionSheet';
 import { PostCaption } from './PostCaption';
 import { Video } from '@/types';
-import { Play, Volume2, VolumeX, MoreHorizontal } from 'lucide-react';
+import { Play, Volume2, VolumeX, MoreHorizontal, BookSearch } from 'lucide-react';
 import { Button } from '@/components/shared/Button';
 import { cn } from '@/utils/cn';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BookReader } from './BookReader';
 
 interface VideoPlayerProps {
   video: Video;
@@ -21,6 +22,9 @@ export function VideoPlayer({ video, isActive, onNext }: VideoPlayerProps) {
   const [showEnding, setShowEnding] = useState(false);
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [isOverlayExpanded, setIsOverlayExpanded] = useState(false);
+  const [isBookLoading, setIsBookLoading] = useState(false);
+  const [bookLoadProgress, setBookLoadProgress] = useState(0);
+  const [isReaderOpen, setIsReaderOpen] = useState(false);
 
   const {
     isPlaying,
@@ -78,6 +82,30 @@ export function VideoPlayer({ video, isActive, onNext }: VideoPlayerProps) {
     if (onNext) onNext();
   };
 
+  // Handle Book Reader
+  const handleBookClick = () => {
+    if (isBookLoading || isReaderOpen) return;
+    
+    setIsBookLoading(true);
+    setBookLoadProgress(0);
+    
+    // Simulate loading
+    const interval = setInterval(() => {
+      setBookLoadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          // Wait 0.3s before opening reader
+          setTimeout(() => {
+            setIsBookLoading(false);
+            setIsReaderOpen(true);
+          }, 300);
+          return 100;
+        }
+        return prev + 2; // Increase speed
+      });
+    }, 20);
+  };
+
   return (
     <div
       ref={containerRef}
@@ -95,6 +123,9 @@ export function VideoPlayer({ video, isActive, onNext }: VideoPlayerProps) {
         onTimeUpdate={onTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
       />
+
+      {/* Bottom Gradient Overlay for Text Visibility */}
+      <div className="absolute bottom-0 left-0 right-0 h-[25vh] bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none z-10" />
 
       {/* Progress Bar - Positioned above BottomNav with spacing */}
       {!isOverlayExpanded && (
@@ -192,10 +223,50 @@ export function VideoPlayer({ video, isActive, onNext }: VideoPlayerProps) {
 
       {/* Action Bar - Just More Button */}
       {!showEnding && !isOverlayExpanded && (
-        <div className="absolute right-3 bottom-[calc(7rem+env(safe-area-inset-bottom))] z-20 pointer-events-auto bg-black/80 rounded-full">
+        <div className="absolute right-3 bottom-[calc(7rem+env(safe-area-inset-bottom))] z-20 pointer-events-auto flex flex-col gap-4">
+          <button
+            onClick={handleBookClick}
+            className="relative p-2 text-white/90 hover:text-white transition-colors bg-black/80 rounded-full"
+            disabled={isBookLoading}
+          >
+             {/* Loading Indicator Border */}
+             {isBookLoading && (
+              <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 40 40">
+                <circle
+                  cx="20"
+                  cy="20"
+                  r="19"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.2)"
+                  strokeWidth="2"
+                />
+                <circle
+                  cx="20"
+                  cy="20"
+                  r="19"
+                  fill="none"
+                  stroke="#FF9800"
+                  strokeWidth="2"
+                  strokeDasharray={119.38} // 2 * PI * 19
+                  strokeDashoffset={119.38 - (119.38 * bookLoadProgress) / 100}
+                  strokeLinecap="round"
+                  className="transition-all duration-75 ease-linear"
+                />
+              </svg>
+            )}
+            
+            {/* Progress Text */}
+            {isBookLoading && (
+              <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-brand">
+                {bookLoadProgress}
+              </span>
+            )}
+            
+            <BookSearch size={24} className={cn(isBookLoading && "opacity-0")} />
+          </button>
           <button
             onClick={() => setShowActionSheet(true)}
-            className="p-2 text-white/90 hover:text-white transition-colors"
+            className="p-2 text-white/90 hover:text-white transition-colors bg-black/80 rounded-full"
           >
             <MoreHorizontal size={24} />
           </button>
@@ -219,6 +290,18 @@ export function VideoPlayer({ video, isActive, onNext }: VideoPlayerProps) {
         onSave={() => console.log('Save', video.id)}
         onShare={() => console.log('Share', video.id)}
       />
+
+      {/* Book Reader Overlay */}
+      <AnimatePresence>
+        {isReaderOpen && (
+          <BookReader 
+            isOpen={isReaderOpen} 
+            onClose={() => setIsReaderOpen(false)}
+            bookTitle={video.related_book?.title}
+            chapterTitle={`Chapter ${video.chapter_index || 1}`}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
